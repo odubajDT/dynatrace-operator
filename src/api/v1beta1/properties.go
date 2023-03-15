@@ -273,6 +273,10 @@ func (dk *DynaKube) NeedAppInjection() bool {
 	return dk.CloudNativeFullstackMode() || dk.ApplicationMonitoringMode()
 }
 
+func (dk *DynaKube) NeedMetricsServer() bool {
+	return dk.Spec.EnableKeptn
+}
+
 func (dk *DynaKube) CustomOneAgentImage() string {
 	switch {
 	case dk.ClassicFullStackMode():
