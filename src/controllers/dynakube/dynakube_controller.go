@@ -284,6 +284,14 @@ func (controller *Controller) reconcileMetricsServer(ctx context.Context, dynaku
 }
 
 func (controller *Controller) setupMetricsServer(ctx context.Context, dynakube *dynatracev1beta1.DynaKube) (err error) {
+	// create deployment for metrics-operator
+	// metricsDeployment := &v1.Deployment{
+
+	// }
+	// service for operator
+	// create CRDs for metrics and metricsprovider
+	// create API server
+	// rbac permissions
 
 	return nil
 }
