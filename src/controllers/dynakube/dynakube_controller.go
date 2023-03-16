@@ -30,6 +30,7 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -265,6 +266,169 @@ func (controller *Controller) reconcileDynaKube(ctx context.Context, dynakube *d
 		log.Info("could not reconcile app injection")
 		return err
 	}
+
+	err = controller.reconcileMetricsServer(ctx, dynakube)
+	if err != nil {
+		log.Info("could not reconcile metrics server")
+		return err
+	}
+
+	return nil
+}
+
+func (controller *Controller) reconcileMetricsServer(ctx context.Context, dynakube *dynatracev1beta1.DynaKube) error {
+	if dynakube.NeedMetricsServer() {
+		return controller.setupMetricsServer(ctx, dynakube)
+	}
+
+	return controller.removeMetricsServer(ctx, dynakube)
+}
+
+func (controller *Controller) setupMetricsServer(ctx context.Context, dynakube *dynatracev1beta1.DynaKube) error {
+	metricsOperator := &appsv1.Deployment{}
+	err := controller.client.Get(ctx, types.NamespacedName{Namespace: "dynatrace", Name: "metrics-operator"}, metricsOperator)
+	if err != nil {
+		return err
+	}
+
+	var replicasNum int32 = 1
+	metricsOperator.Spec.Replicas = &replicasNum
+	if err := controller.client.Update(ctx, metricsOperator); err != nil {
+		return err
+	}
+
+	// metricsOperatorService := &v1.Service{
+	// 	ObjectMeta: metav1.ObjectMeta{
+	// 		Name:      "metrics-operator-service",
+	// 		Namespace: "dynatrace",
+	// 		Labels: map[string]string{
+	// 			"control-plane": "metrics-controller",
+	// 		},
+	// 	},
+	// 	Spec: v1.ServiceSpec{
+	// 		Selector: map[string]string{
+	// 			"control-plane": "metrics-controller",
+	// 		},
+	// 		Ports: []v1.ServicePort{
+	// 			{
+	// 				Name:       "custom-metrics",
+	// 				TargetPort: intstr.IntOrString{StrVal: "custom-metrics", IntVal: 6443},
+	// 				Port:       443,
+	// 			},
+	// 			{
+	// 				Name:       "metrics",
+	// 				TargetPort: intstr.IntOrString{StrVal: "metrics", IntVal: 9999},
+	// 				Port:       9999,
+	// 				Protocol:   "TCP",
+	// 			},
+	// 		},
+	// 	},
+	// }
+
+	// err = controller.client.Create(ctx, metricsOperatorService)
+	// if err != nil {
+	// 	if !k8serrors.IsAlreadyExists(err) {
+	// 		return err
+	// 	}
+	// }
+
+	// apiService1 := apiregistration.APIService{
+	// 	ObjectMeta: metav1.ObjectMeta{
+	// 		Name: "v1beta1.custom.metrics.k8s.io",
+	// 	},
+	// 	Spec: apiregistration.APIServiceSpec{
+	// 		Service: &apiregistration.ServiceReference{
+	// 			Name:      "metrics-operator-service",
+	// 			Namespace: "dynatrace",
+	// 		},
+	// 		Group:                 "custom.metrics.k8s.io",
+	// 		Version:               "v1beta1",
+	// 		InsecureSkipTLSVerify: true,
+	// 		GroupPriorityMinimum:  100,
+	// 		VersionPriority:       100,
+	// 	},
+	// }
+
+	// err = controller.client.Create(ctx, &apiService1)
+	// if err != nil {
+	// 	if !k8serrors.IsAlreadyExists(err) {
+	// 		return err
+	// 	}
+	// }
+
+	// apiService2 := apiregistration.APIService{
+	// 	ObjectMeta: metav1.ObjectMeta{
+	// 		Name: "v1beta2.custom.metrics.k8s.io",
+	// 	},
+	// 	Spec: apiregistration.APIServiceSpec{
+	// 		Service: &apiregistration.ServiceReference{
+	// 			Name:      "metrics-operator-service",
+	// 			Namespace: "dynatrace",
+	// 		},
+	// 		Group:                 "custom.metrics.k8s.io",
+	// 		Version:               "v1beta2",
+	// 		InsecureSkipTLSVerify: true,
+	// 		GroupPriorityMinimum:  100,
+	// 		VersionPriority:       100,
+	// 	},
+	// }
+
+	// err = controller.client.Create(ctx, &apiService2)
+	// if err != nil {
+	// 	if !k8serrors.IsAlreadyExists(err) {
+	// 		return err
+	// 	}
+	// }
+
+	return nil
+}
+
+func (controller *Controller) removeMetricsServer(ctx context.Context, dynakube *dynatracev1beta1.DynaKube) error {
+	metricsOperator := &appsv1.Deployment{}
+	err := controller.client.Get(ctx, types.NamespacedName{Namespace: "dynatrace", Name: "metrics-operator"}, metricsOperator)
+	if err != nil {
+		return err
+	}
+
+	var replicasNum int32 = 0
+	metricsOperator.Spec.Replicas = &replicasNum
+	if err := controller.client.Update(ctx, metricsOperator); err != nil {
+		return err
+	}
+
+	// err = controller.client.Delete(ctx, &v1.Service{
+	// 	ObjectMeta: metav1.ObjectMeta{
+	// 		Name:      "metrics-operator-service",
+	// 		Namespace: "dynatrace",
+	// 	},
+	// })
+	// if err != nil {
+	// 	if !k8serrors.IsNotFound(err) {
+	// 		return err
+	// 	}
+	// }
+
+	// err = controller.client.Delete(ctx, &apiregistration.APIService{
+	// 	ObjectMeta: metav1.ObjectMeta{
+	// 		Name: "v1beta1.custom.metrics.k8s.io",
+	// 	},
+	// })
+	// if err != nil {
+	// 	if !k8serrors.IsNotFound(err) {
+	// 		return err
+	// 	}
+	// }
+
+	// err = controller.client.Delete(ctx, &apiregistration.APIService{
+	// 	ObjectMeta: metav1.ObjectMeta{
+	// 		Name: "v1beta2.custom.metrics.k8s.io",
+	// 	},
+	// })
+	// if err != nil {
+	// 	if !k8serrors.IsNotFound(err) {
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }

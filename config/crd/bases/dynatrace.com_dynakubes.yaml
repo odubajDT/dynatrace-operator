@@ -1038,9 +1038,6 @@ spec:
     - jsonPath: .spec.apiUrl
       name: ApiUrl
       type: string
-    - jsonPath: .status.tokens
-      name: Tokens
-      type: string
     - jsonPath: .status.phase
       name: Status
       type: string
@@ -1522,6 +1519,9 @@ spec:
               enableIstio:
                 description: If enabled, Istio on the cluster will be configured automatically
                   to allow access to the Dynatrace environment
+                type: boolean
+              enableKeptn:
+                default: false
                 type: boolean
               kubernetesMonitoring:
                 description: 'Deprecated: Configuration for Kubernetes Monitoring'
@@ -3381,18 +3381,6 @@ spec:
                     description: Version contains the version to be deployed.
                     type: string
                 type: object
-              communicationHostForClient:
-                description: CommunicationHostForClient caches a communication host
-                  specific to the api url.
-                properties:
-                  host:
-                    type: string
-                  port:
-                    format: int32
-                    type: integer
-                  protocol:
-                    type: string
-                type: object
               conditions:
                 description: Conditions includes status about the current state of
                   the instance
@@ -3463,27 +3451,6 @@ spec:
                   - type
                   type: object
                 type: array
-              connectionInfo:
-                description: ConnectionInfo caches information about the tenant and
-                  its communication hosts
-                properties:
-                  communicationHosts:
-                    items:
-                      properties:
-                        host:
-                          type: string
-                        port:
-                          format: int32
-                          type: integer
-                        protocol:
-                          type: string
-                      type: object
-                    type: array
-                  formattedCommunicationEndpoints:
-                    type: string
-                  tenantUUID:
-                    type: string
-                type: object
               dynatraceApi:
                 properties:
                   lastActiveGateConnectionInfoRequest:
@@ -3500,32 +3467,11 @@ spec:
                 description: KubeSystemUUID contains the UUID of the current Kubernetes
                   cluster
                 type: string
-              lastAPITokenProbeTimestamp:
+              lastTokenProbeTimestamp:
                 description: 'Deprecated: use DynatraceApiStatus.LastTokenScopeRequest
-                  instead LastAPITokenProbeTimestamp tracks when the last request
-                  for the API token validity was sent'
+                  instead LastTokenProbeTimestamp tracks when the last request for
+                  the API token validity was sent'
                 format: date-time
-                type: string
-              lastClusterVersionProbeTimestamp:
-                description: LastClusterVersionProbeTimestamp indicates when the cluster's
-                  version was last checked
-                format: date-time
-                type: string
-              lastDataIngestTokenProbeTimestamp:
-                description: 'Deprecated: use LastAPITokenProbeTimestamp instead LastDataIngestTokenProbeTimestamp
-                  tracks when the last request for the DataIngest token validity was
-                  sent'
-                format: date-time
-                type: string
-              lastPaaSTokenProbeTimestamp:
-                description: 'Deprecated: use LastAPITokenProbeTimestamp instead LastPaaSTokenProbeTimestamp
-                  tracks when the last request for the PaaS token validity was sent'
-                format: date-time
-                type: string
-              latestAgentVersionUnixDefault:
-                description: LatestAgentVersionUnixDefault caches the current agent
-                  version for unix and the default installer which is configured for
-                  the environment
                 type: string
               latestAgentVersionUnixPaas:
                 description: LatestAgentVersionUnixDefault caches the current agent
@@ -3576,9 +3522,6 @@ spec:
                     description: Version contains the version to be deployed.
                     type: string
                 type: object
-              tokens:
-                description: Credentials used to connect back to Dynatrace.
-                type: string
               updatedTimestamp:
                 description: UpdatedTimestamp indicates when the instance was last
                   updated

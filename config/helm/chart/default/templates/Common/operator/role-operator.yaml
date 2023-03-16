@@ -70,6 +70,7 @@ rules:
       - get
       - list
       - watch
+      - update
   - apiGroups:
       - apps
     resources:
@@ -116,6 +117,17 @@ rules:
     verbs:
       - list
       - create
+  # - apiGroups:
+  #     - apiregistration.k8s.io
+  #   resources:
+  #     - apiservices
+  #   verbs:
+  #     - create
+  #     - update
+  #     - delete
+  #     - get
+  #     - list
+  #     - watch
   - apiGroups:
       - ""
     resources:

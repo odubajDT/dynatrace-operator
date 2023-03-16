@@ -37,6 +37,38 @@ rules:
       - list
       - watch
       - update
+  # - apiGroups:
+  #     - apiregistration.k8s.io
+  #   resources:
+  #     - apiservices
+  #   verbs:
+  #     - create
+  #     - update
+  #     - delete
+  #     - get
+  #     - list
+  #     - watch
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+  # - apiGroups:
+  #     - ""
+  #   resources:
+  #     - services
+  #   verbs:
+  #     - create
+  #     - update
+  #     - delete
+  #     - get
+  #     - list
+  #     - watch
   - apiGroups:
       - ""
     resources:

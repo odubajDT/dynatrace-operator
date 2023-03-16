@@ -1,0 +1,10 @@
+apiVersion: metrics.keptn.sh/v1alpha2
+kind: KeptnMetric
+metadata:
+  name: cpu-throttling
+  namespace: dynatrace
+spec:
+  provider: 
+    name: dynatrace
+  query: 'builtin:containers.cpu.throttledMilliCores:filter(in("dt.entity.container_group_instance",entitySelector("type(CONTAINER_GROUP_INSTANCE),fromRelationships.IS_CGI_OF_CA(type(CLOUD_APPLICATION),type(CLOUD_APPLICATION),entityId(CLOUD_APPLICATION-1A812A897E51480B))"))):parents:parents:splitBy("dt.entity.cloud_application"):avg&from=now-2m'
+  fetchIntervalSeconds: 60
