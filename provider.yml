@@ -1,0 +1,13 @@
+apiVersion: metrics.keptn.sh/v1alpha2
+kind: KeptnMetricsProvider
+metadata:
+  name: dynatrace
+  namespace: dynatrace
+spec:
+  targetServer: "https://vcj06490.dev.dynatracelabs.com"
+  secretKeyRef:
+    name: test
+    key: apiToken
+
+# retrieve custom metrics: kubectl get --raw '/apis/custom.metrics.k8s.io/v1beta2/namespaces/dynatrace/keptnmetrics.metrics.sh/cpu-throttling/cpu-throttling' | jq .
+# retrieve metrics on port 9999 of metrics-operator-service

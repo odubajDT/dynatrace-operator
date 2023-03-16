@@ -25,6 +25,7 @@ import (
 	k8sruntime "k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	//apiregistration "k8s.io/kube-aggregator/pkg/apis/apiregistration"
 )
 
 // Scheme contains the type definitions used by the Operator and tests
@@ -37,5 +38,6 @@ func init() {
 	utilruntime.Must(istiov1alpha3.AddToScheme(Scheme))
 	utilruntime.Must(corev1.AddToScheme(Scheme))
 	utilruntime.Must(apiv1.AddToScheme(Scheme))
+	//utilruntime.Must(apiregistration.AddToScheme(Scheme))
 	// +kubebuilder:scaffold:scheme
 }
