@@ -1,6 +1,6 @@
 module github.com/Dynatrace/dynatrace-operator
 
-go 1.20
+go 1.19
 
 require (
 	github.com/container-storage-interface/spec v1.8.0
@@ -28,6 +28,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.26.1
 	k8s.io/apimachinery v0.26.2
 	k8s.io/client-go v0.26.1
+	k8s.io/kube-aggregator v0.26.1
 	k8s.io/utils v0.0.0-20221128185143-99ec85e7a448
 	sigs.k8s.io/controller-runtime v0.14.5
 	sigs.k8s.io/e2e-framework v0.1.0
